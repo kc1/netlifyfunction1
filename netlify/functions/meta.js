@@ -1,4 +1,6 @@
-const fetch = require('node-fetch');
+const fetch = require('node-fetch').default
+var encoding = require("encoding");
+
 // const bluebird = require("bluebird");
 
 const requestverificationtoken = "0xbRnb1lh0zsbjSOgva4NjhHpIQWU7rxcuPMcSMdiO49778S0T9agjJiWM-9_KEyZe8s88gvM9EiimY2hbek9YugWEUm4ZCuIDbZ3RmeqGY1:maXZc5_c4fezGSzpblzALRRY6gN-_wbHtqFnaGfvpM1fCMz9QJtKc8dwuDFMsx8IKI_HHHzwqXCwKJKcFqgBxLvA97uUHQNPOpBq2nktxCo1";

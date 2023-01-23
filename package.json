@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/kc1/netlifyfunction1#readme",
   "dependencies": {
+    "encoding": "^0.1.13",
     "node-fetch": "^3.3.0",
     "puppeteer-core": "^19.4.0"
   },
