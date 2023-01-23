@@ -1,0 +1,3 @@
+important: if using puppeterer core use the following chromium package-- works on netlify:
+
+"@sparticuz/chromium": "^109.0.1"
