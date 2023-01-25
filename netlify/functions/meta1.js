@@ -143,16 +143,40 @@ async function run6(apn) {
 
 
 
-exports.handler = async function () {
+exports.handler = async function (event, context) {
 
-    const apn = '110067270';
+    const body = JSON.parse(event.body); // postencoded
+    // const apn = '110067270';
+    const apn = body.apn;
+    const _id = body._id;
     console.log('starting ', apn);
     const data = await run6(apn);
-
+    let obj = {};
+    obj.apn = apn;
+    obj.parcelUse = data.Property.ParcelUse;
+    obj.long = data.Area.Longitude;
+    obj.lat = data.Area.Latitude;
+    obj.LandSqFt = data.Area.LandSqFt;
+    obj.PropType = data.Structure[0].PropType;
+    obj.ParcelOwner = data.TaxPayer.ParcelOwner.trim();
+    obj.Mail2 = data.TaxPayer.Mail2.trim();
+    obj.Mail3 = data.TaxPayer.Mail3.trim()
+    obj.Mail4 = data.TaxPayer.Mail4.trim();
+    obj.Mail5 = data.TaxPayer.Mail5.trim();
+    const Zip = data.TaxPayer.Zip.trim();
+    const Zip4 = data.TaxPayer.Zip4;
+    let zip;
+    if (Zip4.length > 0) {
+        zip = Zip + '-' + Zip4;
+    } else {
+        zip = Zip;
+    }
+    obj.zip = zip;
+    obj._id = _id;
     return {
         statusCode: 200,
         body: JSON.stringify({
-            message: data
+            message: obj
         })
     }
 
