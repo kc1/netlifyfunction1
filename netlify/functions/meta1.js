@@ -153,19 +153,19 @@ exports.handler = async function (event, context) {
     const data = await run6(apn);
     let obj = {};
     obj.apn = apn;
-    obj.parcelUse = data.Property.ParcelUse;
-    obj.long = data.Area.Longitude;
-    obj.lat = data.Area.Latitude;
-    obj.LandSqFt = data.Area.LandSqFt;
-    obj.PropType = data.Structure[0].PropType;
-    obj.ParcelOwner = data.TaxPayer.ParcelOwner.trim();
-    obj.Mail2 = data.TaxPayer.Mail2.trim();
-    obj.Mail3 = data.TaxPayer.Mail3.trim()
-    obj.Mail4 = data.TaxPayer.Mail4.trim();
-    obj.Mail5 = data.TaxPayer.Mail5.trim();
-    const Zip = data.TaxPayer.Zip.trim();
-    const Zip4 = data.TaxPayer.Zip4;
-    let zip;
+    obj.parcelUse = data.Property.ParcelUse || false;
+    obj.long = data.Area.Longitude || false;
+    obj.lat = data.Area.Latitude || false;
+    obj.LandSqFt = data.Area.LandSqFt || false;
+    obj.PropType = data.Structure[0].PropType || false;
+    obj.ParcelOwner = data.TaxPayer.ParcelOwner.trim() || false;
+    obj.Mail2 = data.TaxPayer.Mail2.trim() || false;
+    obj.Mail3 = data.TaxPayer.Mail3.trim()  || false;
+    obj.Mail4 = data.TaxPayer.Mail4.trim() || false;
+    obj.Mail5 = data.TaxPayer.Mail5.trim() || false;
+    const Zip = data.TaxPayer.Zip.trim() || false;
+    const Zip4 = data.TaxPayer.Zip4 || false;
+    let zip 
     if (Zip4.length > 0) {
         zip = Zip + '-' + Zip4;
     } else {
