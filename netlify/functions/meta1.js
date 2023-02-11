@@ -2,14 +2,12 @@ const fetch = require('node-fetch')
 var encoding = require("encoding");
 const timestamp = require('unix-timestamp');
 
-
 // const bluebird = require("bluebird");
 
 const requestverificationtoken = "0xbRnb1lh0zsbjSOgva4NjhHpIQWU7rxcuPMcSMdiO49778S0T9agjJiWM-9_KEyZe8s88gvM9EiimY2hbek9YugWEUm4ZCuIDbZ3RmeqGY1:maXZc5_c4fezGSzpblzALRRY6gN-_wbHtqFnaGfvpM1fCMz9QJtKc8dwuDFMsx8IKI_HHHzwqXCwKJKcFqgBxLvA97uUHQNPOpBq2nktxCo1";
 // "requestverificationtoken": "0xbRnb1lh0zsbjSOgva4NjhHpIQWU7rxcuPMcSMdiO49778S0T9agjJiWM-9_KEyZe8s88gvM9EiimY2hbek9YugWEUm4ZCuIDbZ3RmeqGY1:maXZc5_c4fezGSzpblzALRRY6gN-_wbHtqFnaGfvpM1fCMz9QJtKc8dwuDFMsx8IKI_HHHzwqXCwKJKcFqgBxLvA97uUHQNPOpBq2nktxCo1",
-const verify = 'z2i5k58Fo5Q9oDevV%2bVFkm4CCNINh35pMET96%2fziejk%3d';
-
-async function getSessionCookie(str) {
+// const verify = 'bEBIC%2fCH1rK8bbXyMTvFKQeilnahApH3VHHAPR%2f%2fBu4%3d';
+async function getSessionCookie(str,verify) {
 
     // "body": "{\"parcelNumber\":\"123\",\"verify\":\"E%2bYuK0lWZ9n1mkYtup4CbR4q6q4mheYLdJXXuyOMilQ%3d\"}",
     // const b = '{\"taxPayer\":\"aaa\",\"verify\":\"KULNfBX43eEKDKSfYSbZr7gscQd0aBP%2bv5uRPjtKvdg%3d\"}';
@@ -68,11 +66,9 @@ async function getSessionCookie(str) {
 }
 
 
-async function run6(apn) {
-    const cookie = await getSessionCookie(apn);
+async function run6(apn,verify) {
+    const cookie = await getSessionCookie(apn,verify);
     console.log(cookie);
-    const cookie1 = "ASP.NET_SessionId=aonfqye5wi1k032y0mvgmbsj";
-    const cookies = `${cookie}; __gsas=ID=f85f1dcbee47ae1f:T=1671230082:S=ALNI_MYTM1Yhx9nNPukf_PH8L1X5bKlSNA`;
     console.log(apn)
     const now = (timestamp.now() * 1000).toString().trim();
     // console.log(1669410712221);
@@ -148,31 +144,33 @@ exports.handler = async function (event, context) {
     const body = JSON.parse(event.body); // postencoded
     // const apn = '110067270';
     const apn = body.apn;
-    const _id = body._id;
+    const verify = body.verify;
     console.log('starting ', apn);
-    const data = await run6(apn);
+    const data = await run6(apn,verify);
+    console.log(data.Structure);
     let obj = {};
     obj.apn = apn;
     obj.parcelUse = data.Property.ParcelUse || "";
     obj.long = data.Area.Longitude || "";
     obj.lat = data.Area.Latitude || "";
     obj.LandSqFt = data.Area.LandSqFt || "";
-    obj.PropType = data.Structure[0].PropType || "";
+    if (data.Structure && data.Structure[0] && data.Structure[0].PropType) {
+        obj.PropType = data.Structure[0].PropType || "";
+    }
     obj.ParcelOwner = data.TaxPayer.ParcelOwner.trim() || "";
     obj.Mail2 = data.TaxPayer.Mail2.trim() || "";
-    obj.Mail3 = data.TaxPayer.Mail3.trim()  || "";
+    obj.Mail3 = data.TaxPayer.Mail3.trim() || "";
     obj.Mail4 = data.TaxPayer.Mail4.trim() || "";
     obj.Mail5 = data.TaxPayer.Mail5.trim() || "";
     const Zip = data.TaxPayer.Zip.trim() || "";
     const Zip4 = data.TaxPayer.Zip4 || "";
-    let zip 
+    let zip
     if (Zip4.length > 0) {
         zip = Zip + '-' + Zip4;
     } else {
         zip = Zip;
     }
     obj.zip = zip;
-    obj._id = _id;
     return {
         statusCode: 200,
         body: JSON.stringify({
