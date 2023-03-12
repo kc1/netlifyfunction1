@@ -110,11 +110,11 @@ async function runParallel(promiseArray) {
 }
 
 
-async function run2() {
+async function run() {
 
   var begin = Date.now();
   const records = await getRecords(firstNum);
-  const groupedRecords = await groupRecordsIntoSubarrays(records, 2);
+  const groupedRecords = await groupRecordsIntoSubarrays(records, 10);
   console.log(groupedRecords);
   for (let i = 0; i < groupedRecords.length; i++) {
     const groupedRecord = groupedRecords[i];
@@ -129,78 +129,8 @@ async function run2() {
   console.log((end - begin) / 60000 + " minutes");
 }
 
-run2();
+run();
 
 // notes: 0071 (VACANT INCOMPLETE URBAN SUBDIVIDED)
 
 
-
-// async function run3() {
-
-
-//   const filter = { 'Yearly': { $exists: false }, 'Owed': { $exists: false }, 'UseCode': { $regex: /^00/ } };
-
-//   let records = await collection.find(filter).limit(firstNum).toArray()
-//   console.log('number of records selected from db: ', records.length);
-
-//   while (records.length) {
-//     console.log('-----------------------------------------------------------');
-//     // TotalPages:
-//     const record = records.pop();
-//     // const to = rn(400, 800);
-
-
-//     // await sleep(to);
-
-//     const apn = record.Parcel;
-//     // const apn = '129050070';
-//     console.log(apn);
-//     const url = fetch(apn);
-//     // const html = await fetchByAPN(apn);
-
-//     const r = await url;
-//     const body = await r.text()
-//     console.log(body);
-//   }
-
-//   const perChunk = 2 // items per chunk    
-
-//   const inputArray = ['a', 'b', 'c', 'd', 'e']
-
-//   const result = inputArray.reduce((resultArray, item, index) => {
-//     const chunkIndex = Math.floor(index / perChunk)
-
-//     if (!resultArray[chunkIndex]) {
-//       resultArray[chunkIndex] = [] // start a new chunk
-//     }
-
-//     resultArray[chunkIndex].push(item)
-
-//     return resultArray
-//   }, [])
-
-//   console.log(result); // result: [['a','b'], ['c','d'], ['e']]
-
-
-
-
-
-//   const fetchURL = (obj) => fetch('http://localhost:8888/.netlify/functions/puppetPimaTaxes.js', {
-//     method: 'POST',
-//     body: JSON.stringify(obj),
-//     headers: { 'Content-Type': 'application/json' }
-//   });
-//   for (let i = 0; i < records.length; i++) {
-//     const record = records[i];
-
-//   }
-
-  // const promiseArray = [URL1, URL2, URL3].map(fetchURL);
-//   const promiseArray = result.map(fetchURL);
-//   const output = await Promise.all(promiseArray);
-
-//   await collection.updateOne({ _id: record._id }, { $set: { "UseCode": parcelUse, "long": long, "lat": lat, "LandSqFt": LandSqFt, 'PropType': PropType, "ParcelOwner": ParcelOwner, "Mail2": Mail2, "Mail3": Mail3, "Mail4": Mail4, "Mail5": Mail5, "zip": zip } });
-
-// }
-
-// run2();

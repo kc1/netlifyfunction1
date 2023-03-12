@@ -100,16 +100,6 @@ let myObj = {}
   // {TOTAL DUE: '$0.00'}
 
 
-  // // // for (let k = 0; k < myArr.length; k++) {
-  // // //   const key = Object.keys(myArr[k]).pop();
-  // // //   if (key.includes("TOTAL")) {
-  // // //     const myobj = myArr[k];
-  // // //     totalDue = myobj[key];
-  // // //   }
-  // // // }
-  // // console.log('---------');
-  // // const totalDueNum = Number(totalDue.replace(/[^0-9.-]+/g, ""));
-  // console.log(totalDueNum);
   console.log('---------');
   console.log('---------');
   return {
