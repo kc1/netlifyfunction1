@@ -1,0 +1,29 @@
+1) When running project you just run pimaBase - netlifyfunction1$ node ./public/pimaBase.js 10
+
+2) while testing you can run dev server locally for puppetpimataxes using ; netlify dev
+
+3)deploy with puppetPimaTaxes : netlify deploy --prod
+
+4) One way to update from pima319 to pima325:
+
+first go into 319 in compass and use the aggregate tab to remove all inserted table fields - probably last 8-10 (in capitals). in second stage select "$unset" then pass array like: [""] AMOUNT
+"CERT NO"
+"FEES"
+"INTEREST"
+"INTEREST DATE"
+"INTERESTPERCENT"
+"PAY"
+"PENALTIES"
+"TAX YEAR"
+"TOTAL DUE"
+
+9) check that all records have { 'TOTAL DUE': { $exists: true }} - if they don't errors will occur.
+
+10) get the more than 1 year cases - ie have penalties.
+
+{$and: [{'PENALTIES':{$exists:true}},{ 'PENALTIES': { $not: { $regex: /\$0\./ } }}]}
+
+11) Next get properties with interest - sort by area
+
+{$and: [{ 'TOTAL DUE': { $exists: true }},{ 'TOTAL DUE': { $not: { $regex: { pattern: '\\\\$0\\\\.', options: '' } } }}]}
+

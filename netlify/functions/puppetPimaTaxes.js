@@ -40,7 +40,7 @@ function delay(time) {
 }
 
 // async function run() {
-  exports.handler = async function (event, context) {
+exports.handler = async function (event, context) {
 
   const body = JSON.parse(event.body); // postencoded
   // const apn = '129050070';
@@ -64,8 +64,7 @@ function delay(time) {
   const data = await page.content();
   await browser.close();
   const $ = cheerio.load(data);
-  // let myArr = [];
-let myObj = {}
+  let myObj = {}
   const head = $('#tblAcctBal > thead > tr');
   const foot = $('#tblAcctBal > tfoot > tr');
   const h = $(head).find('th');
@@ -74,7 +73,7 @@ let myObj = {}
     const hElement = $(h[i]).text();
     const fElement = $(f[i]).text();
     // myArr.push({ [hElement]: fElement });
-    myObj[hElement]=fElement;
+    myObj[hElement] = fElement;
   }
   // console.log(myArr);
   console.log(myObj);
@@ -106,7 +105,7 @@ let myObj = {}
     statusCode: 200,
     body: JSON.stringify({
       // message: { 'apn': apn, 'myArr': myArr, 'totalDue': totalDueNum }
-      message: { 'apn': apn, 'myObj': myObj}
+      message: { 'apn': apn, 'myObj': myObj }
     })
   }
 
