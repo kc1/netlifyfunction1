@@ -7,7 +7,7 @@
 4) One way to update from pima319 to pima325:
 
 first go into 319 in compass and use the aggregate tab to remove all inserted table fields - probably last 8-10 (in capitals). in second stage select "$unset" then pass array like: 
-["AMOUNT","CERT NO","FEES","INTEREST","INTEREST DATE","INTERESTPERCENT","PAY","PENALTIES","TAX YEAR","TOTAL DUE"]
+["AMOUNT","CERT NO  ","FEES","INTEREST","INTEREST DATE","INTERESTPERCENT","PAY","PENALTIES","TAX YEAR","TOTAL DUE"]
 
 9) check that all records have { 'TOTAL DUE': { $exists: true }} - if they don't errors will occur.
 
@@ -15,9 +15,15 @@ first go into 319 in compass and use the aggregate tab to remove all inserted ta
 
 {$and: [{'PENALTIES':{$exists:true}},{ 'PENALTIES': { $not: { $regex: /\$0\./ } }}]}
 
-11) Next get properties with interest - sort by area
+try:
+
+{ 'PENALTIES': { $not: { $regex: /\$0\./ } }}
+
+11) Next get properties with interest but not penalties - sort by area
 
 {$and: [{ INTEREST: { $exists: true }},{ INTEREST: { $not: { $regex: RegExp("\\$0\\.") } }}]}
+
+{$and: [{ 'PENALTIES': { $regex: RegExp("\\$0\\.") }} ,{ INTEREST: { $not: { $regex: RegExp("\\$0\\.") } }}]}
 
 12) interest but no penalties (within a year?)
 
@@ -26,3 +32,25 @@ first go into 319 in compass and use the aggregate tab to remove all inserted ta
 13) behind on taxes but no penalties, no interest:
 
 {$and: [{PENALTIES: { $regex: RegExp("\\$0\\.") }}, {INTEREST: { $regex: RegExp("\\$0\\.") }} , { "TOTAL DUE": { $not: { $regex: RegExp("\\$0\\.") } }}]}
+
+as pipelines these can be expressed as:
+
+// Pipeline 1
+db.mycollection.aggregate([
+  { $match: { PENALTIES: { $exists: true }, PENALTIES: { $not: { $regex: RegExp("\\$0\\.") } } } },
+  { $out: "coll2 }
+]);
+
+// Pipeline 2
+db.mycollection.aggregate([
+  { $match: { INTEREST: { $exists: true }, INTEREST: { $not: { $regex: RegExp("\\$0\\.") } } } },
+  { $out: "coll2" }
+]);
+
+// Pipeline 3
+db.coll1.aggregate([
+  { $match: { $and: [ { 'PENALTIES': { $regex: RegExp("\\$0\\.") } }, { 'INTEREST': { $regex: RegExp("\\$0\\.") } }, { "TOTAL DUE": { $not: { $regex: RegExp("\\$0\\.") } } } ] } },
+  { $sort: {LandSqFt: -1 } },
+  { $limit: 2500 },
+  { $out: "coll2" }
+]);

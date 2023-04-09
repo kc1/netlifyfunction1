@@ -7,7 +7,7 @@ const client = new MongoClient(murl);
 client.connect();
 const database = client.db("mydata");
 // const collection = database.collection("pima2");
-const collection = database.collection("pima-03-25-2023");
+const collection = database.collection("pima-04-09-2023");
 let firstNum = 1;
 let APNs = [];
 let myArgs = process.argv.slice(2);

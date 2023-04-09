@@ -1,0 +1,66 @@
+I used chat gpt to help me work through and explain code:
+
+The following can be run in the aggregate window of compass. Hit create new -> pipeline from text - then paste this in : it should automate process and create "coll2" collection.
+
+[
+  {
+    $match: {
+      $or: [
+        {
+          PENALTIES: {
+            $not: {
+              $regex: /\$0\./
+            }
+          }
+        },
+        {
+          $and: [
+            {
+              PENALTIES: {
+                $regex: RegExp("\\$0\\.")
+              }
+            },
+            {
+              INTEREST: {
+                $not: {
+                  $regex: RegExp("\\$0\\.")
+                }
+              }
+            }
+          ]
+        },
+        {
+          $and: [
+            {
+              PENALTIES: {
+                $regex: RegExp("\\$0\\.")
+              }
+            },
+            {
+              INTEREST: {
+                $regex: RegExp("\\$0\\.")
+              }
+            },
+            {
+              "TOTAL DUE": {
+                $not: {
+                  $regex: RegExp("\\$0\\.")
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    $project: {
+      _id: 0
+    }
+  },
+  {
+    $out: "coll2"
+  }
+]
+
+
