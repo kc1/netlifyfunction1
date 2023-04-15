@@ -16,7 +16,7 @@
                 "<node_internals>/**"
             ],
             // "program": "${workspaceFolder}/netlify/functions/puppetPimaTaxes.js"
-            "program": "${workspaceFolder}/public/pimaBase.js"
+            "program": "${workspaceFolder}/public/createFields.js"
             
         }
     ]

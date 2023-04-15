@@ -38,7 +38,7 @@ as pipelines these can be expressed as:
 // Pipeline 1
 db.mycollection.aggregate([
   { $match: { PENALTIES: { $exists: true }, PENALTIES: { $not: { $regex: RegExp("\\$0\\.") } } } },
-  { $out: "coll2 }
+  { $out: "coll2" }
 ]);
 
 // Pipeline 2
@@ -54,3 +54,74 @@ db.coll1.aggregate([
   { $limit: 2500 },
   { $out: "coll2" }
 ]);
+
+// Pipeline 1
+db.mycollection.aggregate([
+  { $match: { PENALTIES: { $exists: true }, PENALTIES: { $not: { $regex: RegExp("\\$0\\.") } } } },
+  { $out: "coll1" }
+]);
+
+// Pipeline 2
+db.mycollection.aggregate([
+  { $match: { INTEREST: { $exists: true }, INTEREST: { $not: { $regex: RegExp("\\$0\\.") } } } },
+  { $merge: { into: { db: "mydata", coll: "temp_coll1" } } }
+]);
+
+// Pipeline 3
+db.coll1.aggregate([
+  { $match: { $and: [ { 'PENALTIES': { $regex: RegExp("\\$0\\.") } }, { 'INTEREST': { $regex: RegExp("\\$0\\.") } }, { "TOTAL DUE": { $not: { $regex: RegExp("\\$0\\.") } } } ] } },
+  { $sort: { field1: -1 } },
+  { $limit: 2500 },
+  { $merge: { into: { db: "mydata", coll: "temp_coll2" } } }
+]);
+
+// Merge temp_coll1 and temp_coll2 into coll2
+db.temp_coll1.aggregate([
+  { $merge: { into: { db: "mydatabase", coll: "coll2" }, on: "_id", whenMatched: "replace", whenNotMatched: "insert" } }
+]);
+db.temp_coll2.aggregate([
+  { $merge: { into: { db: "mydatabase", coll: "coll2" }, on: "_id", whenMatched: "replace", whenNotMatched: "insert" } }
+]);
+
+
+// Pipeline 3
+db.coll1.aggregate([
+  { $match: { $and: [ { 'PENALTIES': { $regex: RegExp("\\$0\\.") } }, { 'INTEREST': { $regex: RegExp("\\$0\\.") } }, { "TOTAL DUE": { $not: { $regex: RegExp("\\$0\\.") } } } ] } },
+  { $sort: {LandSqFt: -1 } },
+  { $limit: 2500 },
+  { $out: "coll2" }
+]);
+
+In mongo db if I had a filter that looks like { $match: { $and: [ { 'PENALTIES': { $regex: RegExp("\\$0\\.") } }, { 'INTEREST': { $regex: RegExp("\\$0\\.") } }, { "TOTAL DUE": { $not: { $regex: RegExp("\\$0\\.") } } } ] } }  
+in collection 1,  with unique index Parcel, how would I make sure that I excluded any parcel in collection 2
+
+chatgpt gives:
+
+
+db.collection1.aggregate([
+  {
+    $lookup: {
+      from: "collection2",
+      localField: "Parcel",
+      foreignField: "Parcel",
+      as: "collection2_docs"
+    }
+  },
+  {
+    $match: {
+      $and: [
+        { 'PENALTIES': { $regex: RegExp("\\$0\\.") } },
+        { 'INTEREST': { $regex: RegExp("\\$0\\.") } },
+        { "TOTAL DUE": { $not: { $regex: RegExp("\\$0\\.") } } },
+        { "collection2_docs": { $size: 0 } } // Exclude any documents with a match in collection2
+      ]
+    }
+  },
+  {
+    $out: "coll5"
+  }
+])
+
+note: I imported this into pima-09-04 as a pipeline by text and it works - to send next mailer rerun pima-9-4
+then run this pipeline.
+
