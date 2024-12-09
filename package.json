@@ -22,7 +22,6 @@
     "extract-us-city": "^0.0.7",
     "mongodb": "^5.1.0",
     "node-fetch": "^2.6.1",
-    "puppeteer-core": "^19.4.0",
     "unix-timestamp": "^1.0.2"
   },
   "devDependencies": {
