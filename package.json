@@ -17,11 +17,15 @@
   },
   "homepage": "https://github.com/kc1/netlifyfunction1#readme",
   "dependencies": {
+    "axios": "^1.7.9",
     "cheerio": "^1.0.0-rc.12",
     "encoding": "^0.1.13",
+    "express": "^4.21.2",
     "extract-us-city": "^0.0.7",
     "mongodb": "^5.1.0",
     "node-fetch": "^2.6.1",
+    "node-persist": "^4.0.3",
+    "qs": "^6.13.1",
     "unix-timestamp": "^1.0.2"
   },
   "devDependencies": {

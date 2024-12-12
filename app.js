@@ -11,7 +11,7 @@ app.use(express.urlencoded({ extended: true }));
 const fs = require("fs").promises;
 const myFunctions = require("./functions");
 const myHelpers = require("./helpers");
-const parcelFact = require("./ParcelFact");
+const parcelFact = require("./netlify/functions/ParcelFact");
 const landcom = require("./landcom");
 const distances = require("./Distances");
 const randSleep = myHelpers.randomSleep;
