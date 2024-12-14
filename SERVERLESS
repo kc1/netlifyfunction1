@@ -1,0 +1,2 @@
+1) first test with ntl dev 
+2) you can push to netlify with: NTL deploy --prod
