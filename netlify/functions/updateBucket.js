@@ -1,7 +1,5 @@
 require("dotenv").config();
-// console.log(process.env) // remove this after you've confirmed it is working
 const { MongoClient } = require("mongodb");
-// var murl = "mongodb://localhost:27017/"
 var murl = process.env.MONGODB_URI;
 const client = new MongoClient(murl);
 client.connect();
@@ -13,24 +11,37 @@ let lastNum = 3;
 let myArgs = process.argv.slice(2);
 console.log(myArgs);
 
-async function pushToBucket(coll, objArr) {
-
+async function upsertToBucket(coll, objArr) {
   for (let i = 0; i < objArr.length; i++) {
     const obj = objArr[i];
-    const result = await coll.insertOne(obj);
-    console.log(
-      `${result.insertedCount} new listing created with the following id: ${result.insertedId}`
-    );
+    // Use listing_id as the unique identifier in the filter.
+    const filter = { listing_id: obj.listing_id };
+    try {
+      const result = await coll.updateOne(
+        filter,
+        { $set: obj },
+        { upsert: true }
+      );
+      if (result.upsertedCount > 0) {
+        console.log(
+          `Upsert created a new listing with id: ${result.upsertedId._id}`
+        );
+      } else if (result.modifiedCount > 0) {
+        console.log(`Updated listing with listing_id: ${obj.listing_id}`);
+      } else {
+        console.log(`No changes made for listing_id: ${obj.listing_id}`);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
 
 exports.handler = async function (event, context) {
   const myObjArray = JSON.parse(event.body);
-  //   const url = obj.val;
-  //   const st = obj.st;
   console.log(myObjArray);
 
-  const data = await pushToBucket(collection, myObjArray);
+  await upsertToBucket(collection, myObjArray);
 
   return {
     statusCode: 200,
