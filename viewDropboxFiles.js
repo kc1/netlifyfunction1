@@ -18,17 +18,18 @@ const { refreshDropboxToken } = require("./refreshToken");
     console.log("Files in folder:", folderContent.entries);
 
     // Download specific file
-    const filePath = "/Wisconsin-Ashland-18012340000-01-07-2025-contours.png";
-    const response = await dbx.filesDownload({ path: filePath });
+    // const filePath = "/Wisconsin-Ashland-18012340000-01-07-2025-contours.png";
+    // const response = await dbx.filesDownload({ path: filePath });
 
     // Save the file locally
-    fs.writeFileSync(
-      response.result.name,
-      response.result.fileBinary,
-      "binary"
-    );
-    console.log(`File downloaded: ${response.result.name}`);
+    // fs.writeFileSync(
+    //   response.result.name,
+    //   response.result.fileBinary,
+    //   "binary"
+    // );
+    // console.log(`File downloaded: ${response.result.name}`);
   } catch (error) {
     console.error("Error:", error);
   }
 })();
+
