@@ -5,7 +5,7 @@ const client = new MongoClient(murl);
 client.connect();
 const database = client.db("mydata");
 let collection = database.collection("bucket1");
-let ignorethiszz;
+// let ignorethiszz;
 let firstNum = 0;
 let lastNum = 3;
 let myArgs = process.argv.slice(2);

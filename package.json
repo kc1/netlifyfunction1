@@ -20,6 +20,8 @@
     "axios": "^1.7.9",
     "cheerio": "^1.0.0-rc.12",
     "dotenv": "^16.4.7",
+    "dropbox": "^10.34.0",
+    "dropbox-v2-api": "^2.5.11",
     "encoding": "^0.1.13",
     "express": "^4.21.2",
     "extract-us-city": "^0.0.7",
