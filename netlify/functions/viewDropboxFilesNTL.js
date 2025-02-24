@@ -1,6 +1,8 @@
 require("dotenv").config();
+const { Console } = require("console");
 const { Dropbox } = require("dropbox");
 const fs = require("fs");
+const { console } = require("inspector");
 // const { refreshDropboxToken } = require("./refreshTokenNTL");
 
 async function refreshToken() {
@@ -23,7 +25,7 @@ async function refreshToken() {
 
     const data = await response.json();
     console.log("New access token:", data.access_token);
-    return data
+    return data;
   } catch (error) {
     console.error("Error refreshing token:", error);
   }
@@ -32,9 +34,9 @@ async function refreshToken() {
 exports.handler = async function (event, context) {
   try {
     // Refresh Dropbox token and create a new Dropbox instance.
-    const data = await  refreshToken();
+    const data = await refreshToken();
     console.log("data", data);
-    const ACCESS_TOKEN =data.access_token;
+    const ACCESS_TOKEN = data.access_token;
     // const dbx = new Dropbox({ accessToken: ACCESS_TOKEN });
 
     // List files in the root folder.
@@ -42,39 +44,90 @@ exports.handler = async function (event, context) {
     // console.log("Files in folder:", folderContent.entries);
 
     const dbx = new Dropbox({ accessToken: ACCESS_TOKEN });
-
-    // List files in app folder
+    // Parse the incoming JSON from the event body
+    // const requestBody = JSON.parse(event.body || "[]");
+    // const postArray = Array.isArray(requestBody) ? requestBody : [requestBody];
+    // console.log("Files array:", postArray);
+    // Next, get list of dropbox file objects in screencast1 app folder
     const filesList = await dbx.filesListFolder({
-      path: ''
+      path: "",
     });
-    console.log('Files:', filesList.result.entries);
+    console.log("Files:", filesList.result.entries);
+    // return
+    // Sort entries in descending order by server_modified date
+    const sortedEntries = filesList.result.entries.sort((a, b) => {
+      return new Date(b.server_modified) - new Date(a.server_modified);
+    });
 
-    const filePaths = filesList.result.entries.map((entry) => entry.path_lower);
-    // Download a specific file.
-    // const filePath = "/Wisconsin-Ashland-18012340000-01-07-2025-contours.png";
-    // const response = await dbx.filesDownload({ path: filePath });
+    console.log("Files:", sortedEntries);
 
-    // Save the file locally.
-    // fs.writeFileSync(
-    //   response.result.name,
-    //   response.result.fileBinary,
-    //   "binary"
-    // );
-    // console.log(`File downloaded: ${response.result.name}`);
+    const filePaths = sortedEntries.map((entry) => entry.path_lower);
+    console.log("filePaths:", filePaths);
+    // return {
+    //   statusCode: 200,
+    //   body: JSON.stringify({
+    //     data: filePaths,
+    //   }),
+    // };
+
+    // return
+
+    resultArr = [];
+    for (var i = 0; i < postArray.length; i++) {
+      let myRow = postArray[i];
+      if (myRow.APN != "") {
+        const searchString = (
+          myRow.state +
+          "_" +
+          myRow.county +
+          "_" +
+          myRow.APN
+        ).toLowerCase();
+        // Filter files that start with the search string
+        console.log(searchString);
+
+        var matchingFiles = filePaths.filter(function (file) {
+          return file.includes(searchString);
+        });
+
+        console.log("matchingFiles: ");
+        console.log(matchingFiles);
+        if (matchingFiles.length) {
+          var waterFile = matchingFiles.find((file) => file.includes("water"));
+          var contourFile = matchingFiles.find((file) =>
+            file.includes("contours")
+          );
+
+          const sharedWaterLink = await dbx.sharingCreateSharedLinkWithSettings(
+            {
+              path: waterFile,
+            }
+          );
+          const sharedContourLink =
+            await dbx.sharingCreateSharedLinkWithSettings({
+              path: contourFile,
+            });
+          myRow.WaterURL = sharedWaterLink.result.url;
+          myRow.ContourURL = sharedContourLink.result.url;
+          resultArr.push(myRow);
+        }
+      }
+    }
+    console.log("resultArr:", resultArr);
 
     return {
       statusCode: 200,
       body: JSON.stringify({
-        // message: `File downloaded: ${response.result.name}`,
-        files: filePaths,
+        data: resultArr,
       }),
     };
+    // };
   } catch (error) {
     console.error("Error:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({
-        error: error.toString(),
+        error: error,
       }),
     };
   }
