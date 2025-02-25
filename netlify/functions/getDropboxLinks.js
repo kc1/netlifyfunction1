@@ -8,12 +8,12 @@ exports.handler = async function (event, context) {
     const postArray = JSON.parse(event.body || "{}");
     console.log("posted", postArray);
 
-    // Replace with the actual URL of your refreshTokenNTL function
-    const refreshTokenUrl = "/.netlify/functions/refreshTokenNTL";
-
-    const response = await fetch(
-      "http://localhost:8888/.netlify/functions/refreshTokenNTL"
-    );
+    // Set refresh token URL based on system
+    const isChromeos = process.platform === 'linux' && process.env.CHROME_RUNTIME;
+    const refreshTokenUrl = isChromeos 
+      ? "http://localhost:8888/.netlify/functions/refreshTokenNTL"
+      : "https://comfy-crisp-d74946.netlify.app/.netlify/functions/refreshTokenNTL";
+    const response = await fetch(refreshTokenUrl);
 
     if (!response.ok) {
       // Log the error response
@@ -127,11 +127,7 @@ exports.handler = async function (event, context) {
 
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        message: "Token refreshed successfully",
-        accessToken: ACCESS_TOKEN,
-        files: filePaths,
-      }),
+      body: JSON.stringify({resultArr}),
     };
   } catch (error) {
     console.error("Error calling refreshTokenNTL:", error);
