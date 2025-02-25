@@ -48,7 +48,7 @@ exports.handler = async function (event, context) {
     const filePath = "/Wisconsin-Ashland-18012340000-01-07-2025-contours.png";
     // const response = await dbx.filesDownload({ path: filePath });
 
-    resultArr = [];
+    let resultArr = [];
     for (var i = 0; i < postArray.length; i++) {
       let myRow = postArray[i];
       if (myRow.APN != "") {
