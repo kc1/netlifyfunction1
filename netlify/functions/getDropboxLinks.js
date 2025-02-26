@@ -60,11 +60,11 @@ exports.handler = async function (event, context) {
     // console.log("Refreshed token data:", data);
     const data = await refreshToken();
     console.log("data", data);
-    // const ACCESS_TOKEN = data.access_token;
+    const ACCESS_TOKEN = data.access_token;
 
 
     // Use the new access token from data.message.access_token
-    const ACCESS_TOKEN = data.access_token;
+    // const ACCESS_TOKEN = data.access_token;
     const dbx = new Dropbox({ accessToken: ACCESS_TOKEN });
     const filesList = await dbx.filesListFolder({
       path: "",
