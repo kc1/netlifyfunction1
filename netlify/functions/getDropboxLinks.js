@@ -4,8 +4,13 @@ const fs = require("fs");
 const fetch = require("node-fetch");
 
 exports.handler = async function (event, context) {
+    // const myObjArray = JSON.parse(event.body);
+  // console.log(myObjArray);
+
+
   try {
-    const postArray = JSON.parse(event.body || "{}");
+
+    const postArray = JSON.parse(event.body);
     console.log("posted", postArray);
 
     // Set refresh token URL based on system
@@ -127,7 +132,7 @@ exports.handler = async function (event, context) {
 
     return {
       statusCode: 200,
-      body: JSON.stringify({resultArr}),
+      body: JSON.stringify(resultArr),
     };
   } catch (error) {
     console.error("Error calling refreshTokenNTL:", error);
