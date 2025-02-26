@@ -38,6 +38,8 @@ async function refreshToken() {
 
 exports.handler = async function (event, context) {
   try {
+    console.log("event");
+    console.log(event);
     const postArray = JSON.parse(event.body);
     console.log("posted", postArray);
 
