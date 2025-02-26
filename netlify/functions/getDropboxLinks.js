@@ -3,6 +3,34 @@ const { Dropbox } = require("dropbox");
 const fs = require("fs");
 const fetch = require("node-fetch");
 
+async function refreshToken() {
+  const params = new URLSearchParams({
+    grant_type: "refresh_token",
+    refresh_token:
+      "rz3n5_bhZvgAAAAAAAAAAZMK3Wfc-CV2rxof3x3lMl9zdSFscuUi_Km0XeZEssQb",
+    client_id: "4wlwoffttm98qno",
+    client_secret: "6xe8cx18dgq5oa5",
+  });
+
+  try {
+    const response = await fetch("https://api.dropbox.com/oauth2/token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: params,
+    });
+
+    const data = await response.json();
+    console.log("New access token:", data.access_token);
+    return data;
+  } catch (error) {
+    console.error("Error refreshing token:", error);
+  }
+}
+
+
+
 exports.handler = async function (event, context) {
     // const myObjArray = JSON.parse(event.body);
   // console.log(myObjArray);
@@ -14,25 +42,29 @@ exports.handler = async function (event, context) {
     console.log("posted", postArray);
 
     // Set refresh token URL based on system
-    const isChromeos = process.platform === 'linux' && process.env.CHROME_RUNTIME;
-    const refreshTokenUrl = isChromeos 
-      ? "http://localhost:8888/.netlify/functions/refreshTokenNTL"
-      : "https://comfy-crisp-d74946.netlify.app/.netlify/functions/refreshTokenNTL";
-    const response = await fetch(refreshTokenUrl);
+    // const isChromeos = process.platform === 'linux' && process.env.CHROME_RUNTIME;
+    // const refreshTokenUrl = isChromeos 
+    //   ? "http://localhost:8888/.netlify/functions/refreshTokenNTL"
+    //   : "https://comfy-crisp-d74946.netlify.app/.netlify/functions/refreshTokenNTL";
+    // const response = await fetch(refreshTokenUrl);
 
-    if (!response.ok) {
-      // Log the error response
-      console.error("Error from refreshTokenNTL:", await response.text());
-      throw new Error(
-        `Failed to refresh token: ${response.status} ${response.statusText}`
-      );
-    }
+    // if (!response.ok) {
+    //   // Log the error response
+    //   console.error("Error from refreshTokenNTL:", await response.text());
+    //   throw new Error(
+    //     `Failed to refresh token: ${response.status} ${response.statusText}`
+    //   );
+    // }
 
-    const data = await response.json();
-    console.log("Refreshed token data:", data);
+    // const data = await response.json();
+    // console.log("Refreshed token data:", data);
+    const data = await refreshToken();
+    console.log("data", data);
+    const ACCESS_TOKEN = data.access_token;
+
 
     // Use the new access token from data.message.access_token
-    const ACCESS_TOKEN = data.message.access_token;
+    // const ACCESS_TOKEN = data.message.access_token;
     const dbx = new Dropbox({ accessToken: ACCESS_TOKEN });
     const filesList = await dbx.filesListFolder({
       path: "",
