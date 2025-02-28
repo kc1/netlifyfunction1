@@ -95,18 +95,16 @@ exports.handler = async function (event, context) {
               direct_only: true
             });
             if (sharedWaterLink.result.links.length > 0) {
-              sharedWaterLink = { result: { url: sharedWaterLink.result.links[0].url.replace("?dl=0", "?raw=1") } };
+              sharedWaterLink = { result: { url: sharedWaterLink.result.links[0].url } };
             } else {
               sharedWaterLink = await dbx.sharingCreateSharedLinkWithSettings({
                 path: waterFile,
               });
-              sharedWaterLink = { result: { url: sharedWaterLink.result.url.replace("?dl=0", "?raw=1") } };
             }
           } catch (error) {
             sharedWaterLink = await dbx.sharingCreateSharedLinkWithSettings({
               path: waterFile,
             });
-             sharedWaterLink = { result: { url: sharedWaterLink.result.url.replace("?dl=0", "?raw=1") } };
           }
 
           try {
@@ -115,18 +113,16 @@ exports.handler = async function (event, context) {
               direct_only: true
             });
             if (sharedContourLinks.result.links.length > 0) {
-              sharedContourLink = { result: { url: sharedContourLinks.result.links[0].url.replace("?dl=0", "?raw=1") } };
+              sharedContourLink = { result: { url: sharedContourLinks.result.links[0].url } };
             } else {
               sharedContourLink = await dbx.sharingCreateSharedLinkWithSettings({
                 path: contourFile,
               });
-              sharedContourLink = { result: { url: sharedContourLink.result.url.replace("?dl=0", "?raw=1") } };
             }
           } catch (error) {
             sharedContourLink = await dbx.sharingCreateSharedLinkWithSettings({
               path: contourFile,
             });
-             sharedContourLink = { result: { url: sharedContourLink.result.url.replace("?dl=0", "?raw=1") } };
           }
 
           myRow.WaterURL = sharedWaterLink.result.url;
