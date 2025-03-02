@@ -1,24 +1,27 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-
-    // "program": "${workspaceFolder}/netlify/functions/pimaBase.js"
-            // "program": "${workspaceFolder}/public/puppetPimaTaxes.js"
-
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Launch Program",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            // "program": "${workspaceFolder}/netlify/functions/puppetPimaTaxes.js"
-            // "program": "${workspaceFolder}/public/createFields.js"
-            "program": "${workspaceFolder}/netlify/functions/updateFlags.js" // "${workspaceFolder}/public/`zzcreateFields.js"
-            
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Netlify Dev",
+      "type": "node",
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "outFiles": ["${workspaceFolder}/.netlify/functions-serve/**/*.js"],
+      "program": "${workspaceFolder}/node_modules/.bin/netlify",
+      "args": ["dev"],
+      "console": "integratedTerminal",
+      "runtimeExecutable": null,
+      "runtimeArgs": ["--inspect-brk=9229"]
+    },
+    {
+      "name": "netlify functions:serve",
+      "type": "node",
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "outFiles": ["${workspaceFolder}/.netlify/functions-serve/**/*.js"],
+      "program": "${workspaceFolder}/node_modules/.bin/netlify",
+      "args": ["functions:serve"],
+      "console": "integratedTerminal"
+    }
+  ]
 }

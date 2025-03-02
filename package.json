@@ -4,7 +4,9 @@
   "description": "Learn how to use serverless functions in less than 30 minutes!",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:debug": "NODE_OPTIONS='--inspect' netlify dev",
+    "debug": "netlify dev --inspect"
   },
   "repository": {
     "type": "git",
@@ -34,6 +36,7 @@
     "unix-timestamp": "^1.0.2"
   },
   "devDependencies": {
-    "@sparticuz/chromium": "^109.0.1"
+    "@sparticuz/chromium": "^109.0.1",
+    "netlify-cli": "^19.0.0"
   }
 }

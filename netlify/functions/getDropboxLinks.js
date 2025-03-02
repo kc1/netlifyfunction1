@@ -21,10 +21,16 @@ async function refreshToken() {
     });
 
     if (!response.ok) {
-      console.error("Error refreshing token:", response.status, response.statusText);
+      console.error(
+        "Error refreshing token:",
+        response.status,
+        response.statusText
+      );
       const errorText = await response.text();
       console.error("Error details:", errorText);
-      throw new Error(`Failed to refresh token: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Failed to refresh token: ${response.status} ${response.statusText}`
+      );
     }
 
     const data = await response.json();
@@ -40,7 +46,7 @@ exports.handler = async function (event, context) {
   try {
     console.log("event");
     console.log(event);
-    const postArray = JSON.parse(event.body);
+    let postArray = JSON.parse(event.body);
     console.log("posted", postArray);
 
     const data = await refreshToken();
@@ -92,45 +98,79 @@ exports.handler = async function (event, context) {
           try {
             sharedWaterLink = await dbx.sharingListSharedLinks({
               path: waterFile,
-              direct_only: true
+              direct_only: true,
             });
             if (sharedWaterLink.result.links.length > 0) {
-              sharedWaterLink = { result: { url: sharedWaterLink.result.links[0].url.replace("?dl=0", "?raw=1") } };
+              sharedWaterLink = {
+                result: {
+                  url: sharedWaterLink.result.links[0].url.replace(
+                    "?dl=0",
+                    "?raw=1"
+                  ),
+                },
+              };
             } else {
               sharedWaterLink = await dbx.sharingCreateSharedLinkWithSettings({
                 path: waterFile,
               });
-              sharedWaterLink = { result: { url: sharedWaterLink.result.url.replace("?dl=0", "?raw=1") } };
+              sharedWaterLink = {
+                result: {
+                  url: sharedWaterLink.result.url.replace("?dl=0", "?raw=1"),
+                },
+              };
             }
           } catch (error) {
             sharedWaterLink = await dbx.sharingCreateSharedLinkWithSettings({
               path: waterFile,
             });
-             sharedWaterLink = { result: { url: sharedWaterLink.result.url.replace("?dl=0", "?raw=1") } };
+            sharedWaterLink = {
+              result: {
+                url: sharedWaterLink.result.url.replace("?dl=0", "?raw=1"),
+              },
+            };
           }
 
+          let sharedContourLink;
           try {
             const sharedContourLinks = await dbx.sharingListSharedLinks({
               path: contourFile,
-              direct_only: true
+              direct_only: true,
             });
             if (sharedContourLinks.result.links.length > 0) {
-              sharedContourLink = { result: { url: sharedContourLinks.result.links[0].url.replace("?dl=0", "?raw=1") } };
+              sharedContourLink = {
+                result: {
+                  url: sharedContourLinks.result.links[0].url.replace(
+                    "?dl=0",
+                    "?raw=1"
+                  ),
+                },
+              };
             } else {
-              sharedContourLink = await dbx.sharingCreateSharedLinkWithSettings({
-                path: contourFile,
-              });
-              sharedContourLink = { result: { url: sharedContourLink.result.url.replace("?dl=0", "?raw=1") } };
+              sharedContourLink = await dbx.sharingCreateSharedLinkWithSettings(
+                {
+                  path: contourFile,
+                }
+              );
+              sharedContourLink = {
+                result: {
+                  url: sharedContourLink.result.url.replace("?dl=0", "?raw=1"),
+                },
+              };
             }
           } catch (error) {
             sharedContourLink = await dbx.sharingCreateSharedLinkWithSettings({
               path: contourFile,
             });
-             sharedContourLink = { result: { url: sharedContourLink.result.url.replace("?dl=0", "?raw=1") } };
+            sharedContourLink = {
+              result: {
+                url: sharedContourLink.result.url.replace("?dl=0", "?raw=1"),
+              },
+            };
           }
 
-          myRow.WaterURL = sharedWaterLink.result.url;
-          myRow.ContourURL = sharedContourLink.result.url;
+          // Directly assign the modified URLs to myRow
+          myRow.WaterURL = sharedWaterLink.result.url.replace("&dl=0", "&raw=1");
+          myRow.ContourURL = sharedContourLink.result.url.replace("&dl=0", "&raw=1");
           resultArr.push(myRow);
         }
       }
