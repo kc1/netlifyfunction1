@@ -36,8 +36,6 @@ async function resetCollection(authToken) {
   }
 }
 
-
-
 async function test3(lat, lon, AuthToken) {
   // "https://api-prod.corelogic.com/spatial-tile/parcels/SpatialRecordUTPremium?lat=33.80045582382531&lon=-84.48427394094072&pageNumber=1&pageSize=4&access_token=Ehln39JeHKoMtduVvnzZVoMZgtwV",
   const myUrl = `https://api-prod.corelogic.com/spatial-tile/parcels/SpatialRecordUTPremium?lat=${lat}&lon=${lon}&pageNumber=1&pageSize=4&access_token=${AuthToken}`;
@@ -109,17 +107,24 @@ async function login3() {
   });
 }
 async function getOneAPN(lat, lon) {
-
   let authKey;
   const now = new Date();
   const element = await getOneElementFromCollection();
-  if (!element ||( element && now - element.timestamp > 1000 * 60 * 60 * 6)) {
+  console.log("element ", element);
+  if (
+    element &&
+    element.authToken &&
+    element.timestamp &&
+    now - element.timestamp < 1000 * 60 * 60 * 6
+  ) {
+    authKey = element.authToken;
+  } else {
     const o = await login3();
     const token = await auth2();
-    authKey = token.authToken;
+    console.log("token ", token);
+    authKey = token.authKey;
+    console.log("authKey ", authKey);
     const response = await resetCollection(authKey);
-  }else {
-    authKey = element.authToken;
   }
 
   if (lat && lon) {
