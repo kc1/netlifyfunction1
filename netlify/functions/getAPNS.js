@@ -114,20 +114,11 @@ async function getOneAPN(lat, lon) {
   console.log(now);
   console.log(element?.timestamp);
   console.log(now - element?.timestamp);
-  if (
-    element?.authToken?.length > 0 &&
-    element?.timestamp &&
-    now - element.timestamp < 1000 * 60 * 60 * 6
-  ) {
-    console.log("true");
-  } else {
-    console.log("false");
-  }
 
   if (
     element?.authToken?.length > 0 &&
     element?.timestamp &&
-    now - element.timestamp < 1000 * 60 * 60 
+    now - element.timestamp < 1000 * 60 * 60
   ) {
     authKey = element.authToken;
   } else {
@@ -135,7 +126,6 @@ async function getOneAPN(lat, lon) {
     const token = await auth2();
     console.log("token ", token);
     authKey = token.authKey;
-    console.log("authKey ", authKey);
     console.log("authKey ", authKey);
     const response = await resetCollection(authKey);
   }
