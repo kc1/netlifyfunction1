@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch Netlify Dev",
+      "name": "netlify dev",
       "type": "node",
       "request": "launch",
       "skipFiles": ["<node_internals>/**"],
@@ -10,8 +10,12 @@
       "program": "${workspaceFolder}/node_modules/.bin/netlify",
       "args": ["dev"],
       "console": "integratedTerminal",
-      "runtimeExecutable": null,
-      "runtimeArgs": ["--inspect-brk=9229"]
+      "env": { "BROWSER": "none" },
+      "serverReadyAction": {
+        "pattern": "Server now ready on (https?://[\\w:.-]+)",
+        "uriFormat": "%s",
+        "action": "debugWithChrome"
+      }
     },
     {
       "name": "netlify functions:serve",

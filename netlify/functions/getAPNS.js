@@ -1,8 +1,44 @@
+require("dotenv").config();
+const { MongoClient } = require("mongodb");
+var murl = process.env.MONGODB_URI;
+console.log(murl);
+const client = new MongoClient(murl);
+client.connect();
+const database = client.db("mydata");
+let collection = database.collection("token1");
 
 // const parcelFact = require("./ParcelFact");
 
-async function test3(lat, lon, AuthToken) {
+async function getOneElementFromCollection() {
+  try {
+    const document = await collection.findOne({});
+    return document;
+  } catch (error) {
+    console.error("Error fetching document from MongoDB:", error);
+    return null;
+  }
+}
 
+async function resetCollection(authToken) {
+  try {
+    // Drop the collection if it exists
+    await collection.drop();
+
+    // Insert a single document with authToken and timestamp
+    const document = {
+      authToken: authToken,
+      timestamp: new Date(),
+    };
+    await collection.insertOne(document);
+    console.log("Collection reset and document inserted:", document);
+  } catch (error) {
+    console.error("Error resetting collection:", error);
+  }
+}
+
+
+
+async function test3(lat, lon, AuthToken) {
   // "https://api-prod.corelogic.com/spatial-tile/parcels/SpatialRecordUTPremium?lat=33.80045582382531&lon=-84.48427394094072&pageNumber=1&pageSize=4&access_token=Ehln39JeHKoMtduVvnzZVoMZgtwV",
   const myUrl = `https://api-prod.corelogic.com/spatial-tile/parcels/SpatialRecordUTPremium?lat=${lat}&lon=${lon}&pageNumber=1&pageSize=4&access_token=${AuthToken}`;
 
@@ -17,7 +53,7 @@ async function test3(lat, lon, AuthToken) {
       "sec-fetch-dest": "empty",
       "sec-fetch-mode": "cors",
       "sec-fetch-site": "cross-site",
-      "Referer": "https://parcelfact.com/",
+      Referer: "https://parcelfact.com/",
       "Referrer-Policy": "strict-origin-when-cross-origin",
     },
     body: null,
@@ -74,11 +110,21 @@ async function login3() {
 }
 async function getOneAPN(lat, lon) {
 
-  const o = await login3();
-  const token = await auth2();
+  let authKey;
+  const now = new Date();
+  const element = await getOneElementFromCollection();
+  if (!element ||( element && now - element.timestamp > 1000 * 60 * 60 * 6)) {
+    const o = await login3();
+    const token = await auth2();
+    authKey = token.authToken;
+    const response = await resetCollection(authKey);
+  }else {
+    authKey = element.authToken;
+  }
 
   if (lat && lon) {
-    const obj = await test3(lat, lon, token.authKey);
+    // const obj = await test3(lat, lon, token.authKey);
+    const obj = await test3(lat, lon, authKey);
     return obj.parcels[0];
   } else {
     return "coordinate missing";
@@ -86,19 +132,18 @@ async function getOneAPN(lat, lon) {
 }
 
 exports.handler = async function (event, context) {
-
   const body = JSON.parse(event.body); // postencoded
   // const body = event.body
   // const apn = '110067270';
   const lat = body.lat;
   const lon = body.lon;
-  console.log('starting ', body);
-  console.log('lat ', lat);
-  console.log('lon ', lon);
+  console.log("starting ", body);
+  console.log("lat ", lat);
+  console.log("lon ", lon);
 
-// 
-//   const lat = req.query.lat;
-//   const lon = req.query.lon;
+  //
+  //   const lat = req.query.lat;
+  //   const lon = req.query.lon;
   // const response = await parcelFact.getOneAPN(lat, lon);
   const response = await getOneAPN(lat, lon);
   console.log(response);

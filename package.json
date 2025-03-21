@@ -37,6 +37,6 @@
   },
   "devDependencies": {
     "@sparticuz/chromium": "^109.0.1",
-    "netlify-cli": "^19.0.0"
+    "netlify-cli": "^19.0.2"
   }
 }
