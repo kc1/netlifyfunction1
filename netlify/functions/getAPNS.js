@@ -111,11 +111,23 @@ async function getOneAPN(lat, lon) {
   const now = new Date();
   const element = await getOneElementFromCollection();
   console.log("element ", element);
+  console.log(now);
+  console.log(element?.timestamp);
+  console.log(now - element?.timestamp);
   if (
-    element &&
-    element.authToken &&
-    element.timestamp &&
+    element?.authToken?.length > 0 &&
+    element?.timestamp &&
     now - element.timestamp < 1000 * 60 * 60 * 6
+  ) {
+    console.log("true");
+  } else {
+    console.log("false");
+  }
+
+  if (
+    element?.authToken?.length > 0 &&
+    element?.timestamp &&
+    now - element.timestamp < 1000 * 60 * 60 
   ) {
     authKey = element.authToken;
   } else {
