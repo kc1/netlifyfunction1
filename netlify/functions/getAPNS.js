@@ -124,6 +124,7 @@ async function getOneAPN(lat, lon) {
     console.log("token ", token);
     authKey = token.authKey;
     console.log("authKey ", authKey);
+    console.log("authKey ", authKey);
     const response = await resetCollection(authKey);
   }
 
