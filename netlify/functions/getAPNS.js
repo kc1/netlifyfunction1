@@ -132,7 +132,10 @@ async function getOneAPN(lat, lon) {
 
   if (lat && lon) {
     // const obj = await test3(lat, lon, token.authKey);
-    const obj = await test3(lat, lon, authKey);
+    let obj = await test3(lat, lon, authKey);
+    if (obj.parcels && obj.parcels.length > 0) {
+      obj.parcels[0].authKey = authKey;
+    }
     return obj.parcels[0];
   } else {
     return "coordinate missing";
