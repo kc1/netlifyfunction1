@@ -23,6 +23,7 @@ async function upsertToBucket(coll, objArr) {
         { $set: obj },
         { upsert: true }
       );
+      console.log("result: ", result);
       if (result.upsertedCount > 0) {
         console.log(
           `Upsert created a new listing with id: ${result.upsertedId._id}`
@@ -45,7 +46,7 @@ const headers = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Private-Network": "true",
   "Access-Control-Allow-Headers":
-  "Content-Type, Access-Control-Request-Private-Network",
+    "Content-Type, Access-Control-Request-Private-Network",
   "Access-Control-Allow-Methods": "OPTIONS,POST,GET,HEAD,QUERY,query",
 };
 
