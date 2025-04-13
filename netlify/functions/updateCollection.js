@@ -1,10 +1,12 @@
 require("dotenv").config();
 const { MongoClient } = require("mongodb");
-var murl = process.env.MONGODB_URI;
+// var murl = process.env.MONGODB_URI;
+var murl = "mongodb://localhost:27017/";
 const client = new MongoClient(murl);
 client.connect();
 const database = client.db("mydata");
-let collection = database.collection("bucket1");
+
+// let collection = database.collection("bucket1");
 let firstNum = 0;
 let lastNum = 3;
 let myArgs = process.argv.slice(2);
@@ -36,7 +38,6 @@ async function upsertToBucket(coll, objArr) {
   }
 }
 
-
 const headers = {
   "Cache-Control": "no-cache",
   "Cross-Origin-Opener-Policy": "unsafe-none",
@@ -44,7 +45,7 @@ const headers = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Private-Network": "true",
   "Access-Control-Allow-Headers":
-    "Content-Type, Access-Control-Request-Private-Network",
+  "Content-Type, Access-Control-Request-Private-Network",
   "Access-Control-Allow-Methods": "OPTIONS,POST,GET,HEAD,QUERY,query",
 };
 
@@ -135,9 +136,10 @@ exports.handler = async function (event, context) {
     console.log("event.body: ", event.body);
     const data = JSON.parse(event.body);
     console.log("data: ", data);
-    const coll = data.dbName;
+    const collName = data.dbName;
+    let collection = database.collection(collName);
     const savedArray = data.savedArray;
-    const saved = upsertToBucket(coll,savedArray);
+    const saved = upsertToBucket(collection, savedArray);
     return {
       statusCode: 204,
       headers: headers,
@@ -146,5 +148,4 @@ exports.handler = async function (event, context) {
       }),
     };
   }
-
 };
