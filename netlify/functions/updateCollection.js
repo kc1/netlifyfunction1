@@ -39,6 +39,17 @@ async function upsertToBucket(coll, objArr) {
   }
 }
 
+async function createUniqueIndexForListingId(coll) {
+  try {
+    const indexName = await coll.createIndex({ listing_id: 1 }, { unique: true });
+    console.log(`Unique index created with name: ${indexName}`);
+    return indexName;
+  } catch (error) {
+    console.error("Error creating unique index for listing_id:", error);
+    throw error;
+  }
+}
+
 const headers = {
   "Cache-Control": "no-cache",
   "Cross-Origin-Opener-Policy": "unsafe-none",
@@ -115,6 +126,7 @@ async function ateFirstPageFlags(myURL, state) {
   }
   return objArr;
 }
+
 exports.handler = async function (event, context) {
   console.log("context: ", context);
   console.log("event: ", event);
@@ -132,6 +144,7 @@ exports.handler = async function (event, context) {
       body: null,
     };
   }
+
   if (event.httpMethod === "POST") {
     console.log("event.httpMethod: ", event.httpMethod);
     console.log("event.body: ", event.body);
@@ -139,8 +152,13 @@ exports.handler = async function (event, context) {
     console.log("data: ", data);
     const collName = data.dbName;
     let collection = database.collection(collName);
+
+    // Call the function to ensure a unique index on "listing_id" is created
+    await createUniqueIndexForListingId(collection);
+
     const savedArray = data.savedArray;
-    const saved = upsertToBucket(collection, savedArray);
+    await upsertToBucket(collection, savedArray);
+    
     return {
       statusCode: 204,
       headers: headers,
