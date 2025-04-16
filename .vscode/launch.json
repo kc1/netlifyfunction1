@@ -24,7 +24,7 @@
       "skipFiles": ["<node_internals>/**"],
       "outFiles": ["${workspaceFolder}/.netlify/functions-serve/**/*.js"],
       "program": "${workspaceFolder}/node_modules/.bin/netlify",
-      "args": ["functions:serve"],
+      "args": ["functions:serve", "--port=8888"],
       "console": "integratedTerminal"
     }
   ]

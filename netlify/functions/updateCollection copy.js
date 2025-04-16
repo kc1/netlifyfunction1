@@ -13,12 +13,9 @@ let myArgs = process.argv.slice(2);
 console.log(myArgs);
 
 async function upsertToBucket(coll, objArr) {
-
   for (let i = 0; i < objArr.length; i++) {
-    let obj = objArr[i];
+    const obj = objArr[i];
     // Use listing_id as the unique identifier in the filter.
-    obj = await addFields(obj);
-    console.log("obj: ", obj);
     const filter = { listing_id: obj.listing_id };
     try {
       const result = await coll.updateOne(
@@ -44,10 +41,7 @@ async function upsertToBucket(coll, objArr) {
 
 async function createUniqueIndexForListingId(coll) {
   try {
-    const indexName = await coll.createIndex(
-      { listing_id: 1 },
-      { unique: true }
-    );
+    const indexName = await coll.createIndex({ listing_id: 1 }, { unique: true });
     console.log(`Unique index created with name: ${indexName}`);
     return indexName;
   } catch (error) {
@@ -67,62 +61,50 @@ const headers = {
   "Access-Control-Allow-Methods": "OPTIONS,POST,GET,HEAD,QUERY,query",
 };
 
-async function addFields(obj) {
-
-  // Extract APN and InitialEvaluation if already provided; otherwise, default to null.
-  const APN = obj.APN || null;
-  const InitialEvaluation = obj.InitialEvaluation || null;
-
-  // list_date is taken from the property itself
-  const list_date = obj.list_date || null;
-
-  // Build the AAlink if the permalink is available.
-  const AAlink = obj.permalink
-    ? `https://www.realtor.com/realestateandhomes-detail/${obj.permalink}?from=srp`
-    : null;
-
-  // Process flags: scan the flags property and join the keys whose values are truthy.
-  let flags = null;
-  if (obj.flags) {
-    const flagKeys = Object.keys(obj.flags);
-    flags = flagKeys.filter(key => obj.flags[key]).join(",");
+async function parsePage(jsonInString) {
+  const myJson = await JSON.parse(jsonInString);
+  const propArr = myJson.props.pageProps.properties;
+  console.log(propArr[0]);
+  let coordinates = [];
+  if (propArr) {
+    for (let i = 0; i < propArr.length; i++) {
+      const property = propArr[i];
+      const flagObj = property.flags;
+      const flagKeys = Object.keys(flagObj);
+      let myflags = [];
+      for (let i = 0; i < flagKeys.length; i++) {
+        const flagkey = flagKeys[i];
+        if (flagObj[flagkey]) {
+          myflags.push(flagkey);
+        }
+      }
+      // const lot_sqft = property?.description?.lot_sqft;
+      // const lot_acres = lot_sqft / 43560;
+      // const ppa = property.list_price / lot_acres;
+      // const county = property?.location?.county?.name;
+      // const address = property?.location?.address?.line;
+      // // const myLink = 'https://www.realtor.com/realestateandhomes-detail/' + property.permalink + "?from=srp-list-card";
+      // const myLink =
+      //   "https://www.realtor.com/realestateandhomes-detail/" +
+      //   property.permalink +
+      //   "?from=srp";
+      coordinates.push({
+        // lot_acres: lot_acres,
+        // ppa: ppa,
+        id: i,
+        listing_id: property.listing_id,
+        // coordinate: property.location.address.coordinate,
+        // price: property.list_price,
+        // list_date: property.list_date,
+        // AAlink: myLink,
+        flags: myflags.join(","),
+        // address: address,
+        // county: county,
+        // lot_sqft: lot_sqft,
+      });
+    }
   }
-
-  // Extract coordinates (lat, lon) from the nested object if available.
-  let lat = null,
-    lon = null;
-  if (
-    obj.location &&
-    obj.location.address &&
-    obj.location.address.coordinate
-  ) {
-    lat = obj.location.address.coordinate.lat;
-    lon = obj.location.address.coordinate.lon;
-  }
-
-  // Extract address and state from the location.address
-  const address =
-    obj.location && obj.location.address ? obj.location.address.line : null;
-  const state =
-    obj.location && obj.location.address ? obj.location.address.state : null;
-
-  // updatedAt is simply the current date.
-  const updatedAt = new Date();
-
-  // Return a new object with existing properties merged with the new fields.
-  return {
-    ...obj,
-    APN,
-    InitialEvaluation,
-    list_date,
-    AAlink,
-    flags,
-    lat,
-    lon,
-    address,
-    state,
-    updatedAt,
-  };
+  return coordinates;
 }
 
 async function ateFirstPageFlags(myURL, state) {
@@ -176,7 +158,7 @@ exports.handler = async function (event, context) {
 
     const savedArray = data.savedArray;
     await upsertToBucket(collection, savedArray);
-
+    
     return {
       statusCode: 204,
       headers: headers,
