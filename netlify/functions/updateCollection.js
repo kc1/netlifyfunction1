@@ -68,12 +68,10 @@ const headers = {
 };
 
 async function addFields(obj) {
-
-  // Extract APN and InitialEvaluation if already provided; otherwise, default to null.
+  // Extract fields that might already exist, or default them to null.
   const APN = obj.APN || null;
+  const APN2 = obj.APN2 || null;
   const InitialEvaluation = obj.InitialEvaluation || null;
-
-  // list_date is taken from the property itself
   const list_date = obj.list_date || null;
 
   // Build the AAlink if the permalink is available.
@@ -81,7 +79,7 @@ async function addFields(obj) {
     ? `https://www.realtor.com/realestateandhomes-detail/${obj.permalink}?from=srp`
     : null;
 
-  // Process flags: scan the flags property and join the keys whose values are truthy.
+  // Process flags: join keys with truthy values.
   let flags = null;
   if (obj.flags) {
     const flagKeys = Object.keys(obj.flags);
@@ -89,30 +87,57 @@ async function addFields(obj) {
   }
 
   // Extract coordinates (lat, lon) from the nested object if available.
-  let lat = null,
-    lon = null;
-  if (
-    obj.location &&
-    obj.location.address &&
-    obj.location.address.coordinate
-  ) {
+  let lat = null, lon = null;
+  if (obj.location && obj.location.address && obj.location.address.coordinate) {
     lat = obj.location.address.coordinate.lat;
     lon = obj.location.address.coordinate.lon;
   }
 
-  // Extract address and state from the location.address
+  // Extract address and state from location.address.
   const address =
     obj.location && obj.location.address ? obj.location.address.line : null;
   const state =
     obj.location && obj.location.address ? obj.location.address.state : null;
 
+  // Compute lot_acres from description.lot_sqft if available.
+  const lot_sqft =
+    obj.description && obj.description.lot_sqft
+      ? obj.description.lot_sqft
+      : null;
+  const lot_acres = lot_sqft ? lot_sqft / 43560 : null;
+
   // updatedAt is simply the current date.
   const updatedAt = new Date();
 
-  // Return a new object with existing properties merged with the new fields.
+  // Extract agent details from the advertisers array (using the first advertiser).
+  const AgentName =
+    obj.advertisers &&
+    obj.advertisers.length > 0 &&
+    obj.advertisers[0].name
+      ? obj.advertisers[0].name
+      : null;
+  const AgentEmail =
+    obj.advertisers &&
+    obj.advertisers.length > 0 &&
+    obj.advertisers[0].email
+      ? obj.advertisers[0].email
+      : null;
+  const AgentPhone =
+    obj.advertisers &&
+    obj.advertisers.length > 0 &&
+    obj.advertisers[0].phones &&
+    obj.advertisers[0].phones.length > 0
+      ? obj.advertisers[0].phones[0].number
+      : null;
+
+  // Add price from list_price.
+  const price = obj.list_price || null;
+
+  // Return a new object with merged fields.
   return {
     ...obj,
     APN,
+    APN2,
     InitialEvaluation,
     list_date,
     AAlink,
@@ -121,7 +146,12 @@ async function addFields(obj) {
     lon,
     address,
     state,
+    lot_acres,
     updatedAt,
+    AgentName,
+    AgentEmail,
+    AgentPhone,
+    price,
   };
 }
 
