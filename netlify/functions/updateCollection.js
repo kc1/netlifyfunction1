@@ -69,7 +69,7 @@ const headers = {
 
 async function addFields(obj) {
   // Extract fields that might already exist, or default them to null.
-  const APN = obj.APN || null;
+  const APN = obj.APN || obj.property_id || null;
   const APN2 = obj.APN2 || null;
   const InitialEvaluation = obj.InitialEvaluation || null;
   const list_date = obj.list_date || null;
@@ -110,6 +110,14 @@ async function addFields(obj) {
       : null;
   const lot_acres = lot_sqft ? lot_sqft / 43560 : null;
 
+  // Add price from list_price.
+  const price = obj.list_price || null;
+
+  // Calculate price per acre (ppa) if lot_acres and price are available.
+  const ppa = (price && lot_acres && lot_acres > 0)
+    ? price / lot_acres
+    : null;
+
   // updatedAt is simply the current date.
   const updatedAt = new Date();
 
@@ -134,9 +142,6 @@ async function addFields(obj) {
       ? obj.advertisers[0].phones[0].number
       : null;
 
-  // Add price from list_price.
-  const price = obj.list_price || null;
-
   // Return a new object with merged fields.
   return {
     ...obj,
@@ -152,11 +157,12 @@ async function addFields(obj) {
     state,
     county,
     lot_acres,
+    price,
+    ppa,
     updatedAt,
     AgentName,
     AgentEmail,
     AgentPhone,
-    price,
   };
 }
 
