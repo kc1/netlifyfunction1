@@ -99,6 +99,10 @@ async function addFields(obj) {
   const state =
     obj.location && obj.location.address ? obj.location.address.state : null;
 
+  // Extract county from obj.location.county.
+  const county =
+    obj.location && obj.location.county ? obj.location.county.name : null;
+
   // Compute lot_acres from description.lot_sqft if available.
   const lot_sqft =
     obj.description && obj.description.lot_sqft
@@ -146,6 +150,7 @@ async function addFields(obj) {
     lon,
     address,
     state,
+    county,
     lot_acres,
     updatedAt,
     AgentName,
