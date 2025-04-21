@@ -69,8 +69,8 @@ const headers = {
 
 async function addFields(obj) {
   // Extract fields that might already exist, or default them to null.
-  const APN = obj.APN || obj.property_id || null;
-  const APN2 = obj.APN2 || null;
+  // const APN = obj.APN || obj.property_id || null;
+  // const APN2 = obj.APN2 || null;
   const InitialEvaluation = obj.InitialEvaluation || null;
   const list_date = obj.list_date || null;
 
