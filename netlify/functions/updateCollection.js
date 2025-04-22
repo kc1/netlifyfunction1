@@ -56,6 +56,7 @@ async function createUniqueIndexForListingId(coll) {
   }
 }
 
+//headers for CORS
 const headers = {
   "Cache-Control": "no-cache",
   "Cross-Origin-Opener-Policy": "unsafe-none",
