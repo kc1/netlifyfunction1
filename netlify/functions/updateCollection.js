@@ -146,8 +146,6 @@ async function addFields(obj) {
   // Return a new object with merged fields.
   return {
     ...obj,
-    APN,
-    APN2,
     InitialEvaluation,
     list_date,
     AAlink,
