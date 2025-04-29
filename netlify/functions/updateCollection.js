@@ -1,7 +1,7 @@
 require("dotenv").config();
 const { MongoClient } = require("mongodb");
-var murl = process.env.MONGODB_URI;
-// var murl = "mongodb://localhost:27017/";
+// var murl = process.env.MONGODB_URI;
+var murl = "mongodb://localhost:27017/";
 const client = new MongoClient(murl);
 client.connect();
 const database = client.db("mydata");
@@ -70,8 +70,6 @@ const headers = {
 
 async function addFields(obj) {
   // Extract fields that might already exist, or default them to null.
-  // const APN = obj.APN || obj.property_id || null;
-  // const APN2 = obj.APN2 || null;
   const InitialEvaluation = obj.InitialEvaluation || null;
   const list_date = obj.list_date || null;
 
@@ -87,8 +85,9 @@ async function addFields(obj) {
     flags = flagKeys.filter(key => obj.flags[key]).join(",");
   }
 
-  // Extract coordinates (lat, lon) from the nested object if available.
+  // Initialize lat and lon to null.
   let lat = null, lon = null;
+  // Extract coordinates (lat, lon) from the nested object if available.
   if (
     obj.location &&
     obj.location.address &&
@@ -96,11 +95,13 @@ async function addFields(obj) {
     typeof obj.location.address.coordinate.lat === "number" &&
     typeof obj.location.address.coordinate.lon === "number"
   ) {
-    const { lat, lon } = obj.location.address.coordinate;
-    // Add a "point" property to location with coordinates as [lon, lat]
+    // Assign to our variables.
+    lat = obj.location.address.coordinate.lat;
+    lon = obj.location.address.coordinate.lon;
+    // Optionally, you might set a point on the original location
     obj.location.point = {
       type: "Point",
-      coordinates: [lon, lat]
+      coordinates: [lon, lat] // Note: this is typical GeoJSON order (lon, lat)
     };
   }
 
@@ -129,7 +130,7 @@ async function addFields(obj) {
     ? price / lot_acres
     : null;
 
-  // updatedAt is simply the current date.
+  // Set updatedAt to the current date.
   const updatedAt = new Date();
 
   // Extract agent details from the advertisers array (using the first advertiser).
@@ -153,8 +154,8 @@ async function addFields(obj) {
       ? obj.advertisers[0].phones[0].number
       : null;
 
-  // Return a new object with merged fields.
-  return {
+  // Build the new object with merged fields.
+  let newObj = {
     ...obj,
     InitialEvaluation,
     list_date,
@@ -173,6 +174,18 @@ async function addFields(obj) {
     AgentEmail,
     AgentPhone,
   };
+
+  // Delete the original location property.
+  delete newObj.location;
+
+  // Create a new location property with type 'Point'
+  // and coordinates array with index 0 = lon and index 1 = lat.
+  newObj.location = {
+    type: "Point",
+    coordinates: [lon, lat] 
+  };
+
+  return newObj;
 }
 
 async function ateFirstPageFlags(myURL, state) {

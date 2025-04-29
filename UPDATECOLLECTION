@@ -1,0 +1,10 @@
+make sure to have a location element that looks like:
+
+ newObj.location = {
+    type: "Point",
+    coordinates: [lon, lat] 
+  };
+
+  then you can add:
+
+  db.wisconsinSold2.createIndex({ location: "2dsphere" })
