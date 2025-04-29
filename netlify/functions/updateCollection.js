@@ -89,9 +89,19 @@ async function addFields(obj) {
 
   // Extract coordinates (lat, lon) from the nested object if available.
   let lat = null, lon = null;
-  if (obj.location && obj.location.address && obj.location.address.coordinate) {
-    lat = obj.location.address.coordinate.lat;
-    lon = obj.location.address.coordinate.lon;
+  if (
+    obj.location &&
+    obj.location.address &&
+    obj.location.address.coordinate &&
+    typeof obj.location.address.coordinate.lat === "number" &&
+    typeof obj.location.address.coordinate.lon === "number"
+  ) {
+    const { lat, lon } = obj.location.address.coordinate;
+    // Add a "point" property to location with coordinates as [lon, lat]
+    obj.location.point = {
+      type: "Point",
+      coordinates: [lon, lat]
+    };
   }
 
   // Extract address and state from location.address.
