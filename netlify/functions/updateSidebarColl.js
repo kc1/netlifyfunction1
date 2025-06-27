@@ -39,9 +39,10 @@ async function upsertToBucket(coll, objArr) {
 exports.handler = async function (event, context) {
   // Parse the incoming JSON body
   const body = JSON.parse(event.body);
+  console.log("Received body:", body);
 
   // Extract chat history and image file info
-  const chatHistory = body.chatHistoryJson; // Array of chat messages
+  const chatHistory = body.chatHistory; // Array of chat messages
   const imageFile = body.imageFile;         // { name, data (base64 string) }
 
   // Example: log for debugging
