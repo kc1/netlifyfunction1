@@ -37,21 +37,39 @@ async function upsertToBucket(coll, objArr) {
 }
 
 exports.handler = async function (event, context) {
-
+  // Parse the incoming JSON body
   const body = JSON.parse(event.body);
-  const myCollection = body.myCollection; // <-- get collection name
-  const myObjArray = body.data;           // <-- get array of objects
 
-  console.log(myObjArray);
-  console.log(myCollection);
+  // Extract chat history and image file info
+  const chatHistory = body.chatHistoryJson; // Array of chat messages
+  const imageFile = body.imageFile;         // { name, data (base64 string) }
 
-  let collection = database.collection(myCollection);
-  await upsertToBucket(collection, myObjArray);
+  // Example: log for debugging
+  console.log("Chat History:", chatHistory);
+  console.log("Image File Name:", imageFile?.name);
+  console.log("Image File Data Length:", imageFile?.data?.length);
+
+  // Prepare the record to store in MongoDB
+  const record = {
+    chatHistory: chatHistory,
+    imageFile: {
+      name: imageFile?.name,
+      data: imageFile?.data, // You may want to store as-is, or process further
+      uploadedAt: new Date()
+    }
+  };
+
+  // Choose your collection (hardcoded or from body, as needed)
+  let collection = database.collection("your_collection_name");
+
+  // Insert the record
+  const result = await collection.insertOne(record);
 
   return {
     statusCode: 200,
     body: JSON.stringify({
-      message: myObjArray,
+      message: "Record stored",
+      insertedId: result.insertedId,
     }),
   };
 };
