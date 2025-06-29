@@ -41,9 +41,11 @@ exports.handler = async function (event, context) {
   const body = JSON.parse(event.body);
   console.log("Received body:", body);
 
+// Received body: {Jun 28, 10:48:40 PM: e75e7d18 INFO     myCollection: 'contextThreads',Jun 28, 10:48:40 PM: e75e7d18 INFO     data: {Jun 28, 10:48:40 PM: e75e7d18 INFO       sessionId: 'session_1751165319721',Jun 28, 10:48:40 PM: e75e7d18 INFO       createdAt: '2025-06-29T02:48:39.721Z',Jun 28, 10:48:40 PM: e75e7d18 INFO       updatedAt: '2025-06-29T02:48:39.721Z',Jun 28, 10:48:40 PM: e75e7d18 INFO       history: [ [Object], [Object], [Object], [Object] ]Jun 28, 10:48:40 PM: e75e7d18 INFO     }Jun 28, 10:48:40 PM: e75e7d18 INFO   }
+
   // Extract chat history and image file info
-  const chatHistory = body.chatHistory; // Array of chat messages
-  const imageFile = body.imageFile;         // { name, data (base64 string) }
+  const chatHistory = body.data.history; // Array of chat messages
+  const imageFile = body.data.imageFile;         // { name, data (base64 string) }
 
   // Example: log for debugging
   console.log("Chat History:", chatHistory);
@@ -61,7 +63,7 @@ exports.handler = async function (event, context) {
   };
 
   // Choose your collection (hardcoded or from body, as needed)
-  let collection = database.collection("your_collection_name");
+  let collection = database.collection(body.myCollection);
 
   // Insert the record
   const result = await collection.insertOne(record);
