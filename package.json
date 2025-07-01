@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/kc1/netlifyfunction1#readme",
   "dependencies": {
+    "@langchain/openai": "^0.5.16",
     "axios": "^1.7.9",
     "cheerio": "^1.0.0-rc.12",
     "dotenv": "^16.4.7",
@@ -29,6 +30,7 @@
     "extract-us-city": "^0.0.7",
     "jquery": "^3.7.1",
     "jsdom": "^25.0.1",
+    "langchain": "^0.3.29",
     "mongodb": "^5.1.0",
     "node-fetch": "^2.6.1",
     "node-persist": "^4.0.3",
